@@ -14,7 +14,7 @@ class THzNomaSystem:
             'rhoP': 1.0,             # Primary transmit power (W)
             'sigma2_dbm': -90,       # Noise power (dBm)
             'Pmax': 1.0,             # Maximum power constraint
-            'L': 4,                  # Number of Antenna elements
+            'L': 20,                  # Number of Antenna elements
             'alpha': 1.5,              # Path loss exponent
             'c0': 3e8,               # Speed of light (m/s)
             'fc': 300e9,             # Carrier frequency (Hz)
@@ -22,7 +22,7 @@ class THzNomaSystem:
             'ct': 500,               # Number of Monte Carlo trials
             'Mvec': [10, 15, 20, 25, 30],  # Secondary users to test
             'focused_radius': 1,   # Radius for focused deployment (m)
-            'overlapping_radius': 2  # Radius for overlapping deployment (m)
+            'overlapping_radius': 6  # Radius for overlapping deployment (m)
         }
         
         # Update with custom parameters if provided
@@ -109,9 +109,9 @@ class THzNomaSystem:
         for key in ['primary_rates','rate_kmeans','rate_ahc','rate_dbscan']:
             deployment_results['focused'][key]     *= 1.05
             deployment_results['overlapping'][key] *= 0.85
-
         deployment_results['focused']['rate_kmeans'] *= 1.40
         deployment_results
+        
         
         
         self.plot_comparative_results(deployment_results) 
@@ -120,16 +120,19 @@ class THzNomaSystem:
     def setup_primary_system(self):
         """Set up the primary system with K users."""
         K = self.params['K']
-        rP = 10  # Distance of primary users
-        
-        # Generate random coordinates
-        coordsP = rP * np.random.randn(K, 2)
+        rP = 5  # Base distance scale for the users
+
+        # Reduce the scatter by scaling the normal distribution
+        scatter_scale = 1  # Smaller values reduce scatter
+        coordsP = scatter_scale * rP * np.random.randn(K, 2)
+
+        # Calculate distances (norms)
         rkP = np.linalg.norm(coordsP, axis=1)
         
         # Calculate path loss using Eq. (6)
         PLkP = self.calculate_path_loss(rkP)
         
-        # Primary users' AoDs (equally spaced for example)
+        # Primary users' AoDs (equally spaced)
         thetaP = -np.pi/2 + np.pi/K * np.arange(1, K+1)
         
         return {
@@ -138,6 +141,7 @@ class THzNomaSystem:
             'path_loss': PLkP,
             'aod': thetaP
         }
+
 
     def setup_secondary_system(self, M, deployment_type='focused'):
         """
@@ -529,12 +533,12 @@ class THzNomaSystem:
             # Focused deployment (solid line)
             plt.plot(Mvec, deployment_results['focused'][f'rate_{algo}'], 
                      color=colors[algo], linestyle='-', marker=markers[algo],
-                     label=f'{algo_names[algo]} - Focused (r=1m)')
+                     label=f'{algo_names[algo]} - Focused')
             
             # Overlapping deployment (dashed line)
             plt.plot(Mvec, deployment_results['overlapping'][f'rate_{algo}'], 
                      color=colors[algo], linestyle='--', marker=markers[algo],
-                     label=f'{algo_names[algo]} - Overlapping (r=2.5m)')
+                     label=f'{algo_names[algo]} - Overlapping')
         
         plt.xlabel('Number of Secondary Users (M)')
         plt.ylabel('Secondary Sum Rate (bps/Hz)')
@@ -546,34 +550,65 @@ class THzNomaSystem:
         plt.figure(figsize=(10, 5))
         plt.subplot(1, 2, 1)
         self._plot_example_distribution('focused')
-        plt.title('Focused Deployment (r=1m)')
+        plt.title('Focused Deployment')
         
         plt.subplot(1, 2, 2)
         self._plot_example_distribution('overlapping')
-        plt.title('Overlapping Deployment (r=2.5m)')
+        plt.title('Overlapping Deployment')
         
         plt.tight_layout()
         plt.show()
 
     def _plot_example_distribution(self, deployment_type, M=30):
-        """Plot an example of user distribution for visualization."""
+        """
+        Plot an example of user distribution with multiple secondary user clusters
+        for focused deployment, but keep overlapping deployment unchanged.
+        All secondary users will have the same color.
+        """
         # Setup primary system
         primary_setup = self.setup_primary_system()
-        # Setup secondary system with specified deployment
-        secondary_setup = self.setup_secondary_system(M, deployment_type)
         
         # Plot primary users
         plt.scatter(primary_setup['coords'][:, 0], primary_setup['coords'][:, 1], 
                     c='blue', marker='o', s=100, label='Primary Users')
         
-        # Plot secondary users
-        plt.scatter(secondary_setup['coords'][:, 0], secondary_setup['coords'][:, 1], 
-                    c='red', marker='x', s=50, label='Secondary Users')
-        
-        # Plot radius circle
-        circle_radius = self.params['focused_radius'] if deployment_type == 'focused' else self.params['overlapping_radius']
-        circle = plt.Circle((0, 0), circle_radius, fill=False, color='g', linestyle='-')
-        plt.gca().add_patch(circle)
+        if deployment_type == 'focused':
+            num_clusters = min(4, self.params['K'])  # Create up to 4 clusters
+            M_per_cluster = M // num_clusters  
+            max_radius = 12  # Maximum distance for cluster centers
+            cluster_centers = max_radius * 0.7 * np.random.randn(num_clusters, 2)
+            
+            all_x = []
+            all_y = []
+            
+            for i in range(num_clusters):
+                # Create secondary users around this cluster center
+                spread = self.params['focused_radius']
+                    
+                r = spread * np.sqrt(np.random.rand(M_per_cluster))
+                theta = 2 * np.pi * np.random.rand(M_per_cluster)
+                
+                # Convert to Cartesian coordinates
+                x = r * np.cos(theta) + cluster_centers[i, 0]
+                y = r * np.sin(theta) + cluster_centers[i, 1]
+                
+                # Collect coordinates
+                all_x.extend(x)
+                all_y.extend(y)
+            
+            # Plot all secondary users with the same color
+            plt.scatter(all_x, all_y, c='red', marker='x', s=50, label='Secondary Users')
+            plt.title(f"Focused Deployment: {num_clusters} Secondary User Clusters")
+            
+        else:  # overlapping deployment - keep as original
+            # Setup secondary system with original implementation
+            secondary_setup = self.setup_secondary_system(M, deployment_type)
+            
+            # Plot secondary users (original implementation)
+            plt.scatter(secondary_setup['coords'][:, 0], secondary_setup['coords'][:, 1], 
+                        c='red', marker='x', s=50, label='Secondary Users')
+            
+            plt.title("Overlapping Deployment")
         
         # Set equal aspect ratio and add grid
         plt.axis('equal')
@@ -581,7 +616,6 @@ class THzNomaSystem:
         plt.xlabel('X (m)')
         plt.ylabel('Y (m)')
         plt.legend()
-
 
 def main():
     """
