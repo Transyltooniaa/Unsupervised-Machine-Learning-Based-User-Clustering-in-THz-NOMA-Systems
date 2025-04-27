@@ -147,7 +147,7 @@ def plot_deployments_and_kdist_target(
     ax3.set_xticks(np.arange(0, 31, 5))     # Ticks from K-dist target
     ax3.set_xlim(-1, 30)                    # Limits from K-dist target
     ax3.grid(False)                         # Grid from K-dist target
-    ax3.set_title('(c) KNN in DBSCAN.', fontsize=14, y=-0.20) # Caption
+    ax3.set_title('(c) NN in DBSCAN.', fontsize=14, y=-0.20) # Caption
 
     # Overall adjustments
     plt.tight_layout(rect=[0, 0.05, 1, 1]) # Adjust rect bottom margin
