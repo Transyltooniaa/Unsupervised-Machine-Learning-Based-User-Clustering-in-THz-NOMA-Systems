@@ -1,8 +1,1 @@
-<<<<<<< HEAD
-.DS_Store
-__pycache__/
-=======
-.DS_Store
-__pycache__/
-
->>>>>>> 046132b (Minor Fixes)
+__pycache__
