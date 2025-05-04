@@ -100,7 +100,7 @@ cd Unsupervised-Machine-Learning-Based-User-Clustering-in-THz-NOMA-Systems
 
 1. Execute the main script:
    ```bash
-   python main.py
+   python <filename>.py
    ```
 
 ---
