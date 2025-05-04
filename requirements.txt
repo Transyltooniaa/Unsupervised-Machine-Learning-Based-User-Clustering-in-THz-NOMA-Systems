@@ -1,0 +1,5 @@
+kneed==0.8.5
+matplotlib==3.10.1
+numpy==2.2.5
+scikit_learn==1.6.1
+scipy==1.15.2
