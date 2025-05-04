@@ -1,3 +1,173 @@
+
+
+# Unsupervised Machine Learning-Based User Clustering in THz-NOMA Systems
+
+This repository implements **three unsupervised machine learning algorithms**—K-Means, Agglomerative Hierarchical Clustering (AHC), and DBSCAN—for **user clustering** in Terahertz (THz) Non-Orthogonal Multiple Access (NOMA) systems. The aim is to optimize user clustering, improve system capacity, and enhance energy efficiency in next-generation wireless communication networks.
+
+---
+
+## Table of Contents
+
+- [Overview](#overview)
+- [Features](#features)
+- [Code Structure](#code-structure)
+- [Technology Stack](#technology-stack)
+- [Setup](#setup)
+- [Usage](#usage)
+- [Clustering Methods](#clustering-methods)
+- [Results](#results)
+- [Contributing](#contributing)
+- [License](#license)
+
+---
+
+## Overview
+
+THz-NOMA systems, as a part of next-generation wireless networks, face challenges in user clustering due to high-frequency signal constraints. This repository provides a Monte Carlo-based simulation framework for user clustering using **unsupervised machine learning** techniques. It evaluates the performance of these clustering techniques in THz-NOMA systems under various conditions.
+
+---
+
+## Features
+
+- **Three Clustering Algorithms**:
+  - **K-Means**: Requires a predefined number of clusters.
+  - **Agglomerative Hierarchical Clustering (AHC)**: Clusters users based on Ward's linkage.
+  - **DBSCAN**: Density-based clustering with automatic cluster count detection.
+- **Monte Carlo Simulations**: Randomizes user topologies and calculates average results over multiple trials.
+- **Performance Analysis**: Evaluates primary and secondary network performance in terms of sum rates.
+
+---
+
+## Code Structure
+
+1. **Imports and Parameters**:
+   - Libraries: `numpy`, `matplotlib`, `sklearn`, `scipy.stats`.
+   - System Parameters: Defines constants like the number of antennas (`N`), primary users (`K`), transmit power (`rhoP`), and more.
+
+2. **Main Function (`main()`)**:
+   - Iterates over different numbers of secondary users (`M`).
+   - Performs Monte Carlo simulations to compute data rates for primary and secondary users.
+   - Outputs performance plots.
+
+3. **Key Functions**:
+   - `compute_secondary_rate(S, hS, tjk)`: Calculates secondary user rates based on channel conditions and interference constraints.
+
+Refer to the [README file](https://github.com/Transyltooniaa/Unsupervised-Machine-Learning-Based-User-Clustering-in-THz-NOMA-Systems/blob/61d3249b850f969a54b1f38378be945c375aac73/README.md) for a detailed walkthrough.
+
+---
+
+## Technology Stack
+
+| Language          | Purpose                                   |
+|-------------------|------------------------------------------|
+| **Python**         | Core algorithms and clustering methods. |
+| **Jupyter Notebook** | Simulation and performance analysis.    |
+| **MATLAB**         | Optional for extended modeling.          |
+
+---
+
+## Setup
+
+### Prerequisites
+
+1. **Python Environment**: Install Python 3.8+.
+2. **Dependencies**: Install required Python libraries using:
+   ```bash
+   pip install -r requirements.txt
+   ```
+3. **MATLAB** (Optional): For running MATLAB scripts.
+
+### Clone the Repository
+
+```bash
+git clone https://github.com/Transyltooniaa/Unsupervised-Machine-Learning-Based-User-Clustering-in-THz-NOMA-Systems.git
+cd Unsupervised-Machine-Learning-Based-User-Clustering-in-THz-NOMA-Systems
+```
+
+---
+
+## Usage
+
+### Running Simulations
+
+1. Start Jupyter Notebook:
+   ```bash
+   jupyter notebook
+   ```
+2. Open the simulation notebooks in the `notebooks/` directory and execute the cells.
+
+### Running Python Scripts
+
+1. Execute the main script:
+   ```bash
+   python main.py
+   ```
+
+---
+
+## Clustering Methods
+
+1. **K-Means**:
+   - Groups secondary users into `K` clusters based on their AoDs (Angles of Departure).
+   - Uses the **circular mean** to compute cluster centers.
+
+2. **Agglomerative Hierarchical Clustering (AHC)**:
+   - Groups users in a bottom-up fashion.
+   - Computes cluster centers using Ward's linkage and circular angle calculations.
+
+3. **DBSCAN**:
+   - Automatically detects the number of clusters based on density.
+   - Handles noise points by treating them as single-user clusters.
+
+---
+
+## Results
+
+### Simulation Outputs
+
+1. **Primary Network Performance**:
+   - Sum rate vs. the number of secondary users (`M`).
+
+2. **Secondary Network Performance**:
+   - Sum rate for each clustering method (K-Means, AHC, DBSCAN) vs. `M`.
+
+### Key Insights
+
+- **Angle-Based Clustering**: Groups secondary users with similar AoDs to share the same beam.
+- **Monte Carlo Approach**: Randomizes user topologies to produce generalized results.
+
+---
+
+## Contributing
+
+Contributions are welcome! Here's how to get started:
+
+1. **Fork the repository**.
+2. **Create a branch** for your feature or bugfix:
+   ```bash
+   git checkout -b feature-name
+   ```
+3. **Commit your changes**:
+   ```bash
+   git commit -m "Add feature-name"
+   ```
+4. **Push to your branch**:
+   ```bash
+   git push origin feature-name
+   ```
+5. **Open a pull request**.
+
+---
+
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details. 
+
+---
+
+Let me know if you'd like me to refine this further or add additional details!
+
+
 Below is a **step-by-step** explanation of how the code works. The code implements **three unsupervised clustering algorithms**—**K-Means**, **Agglomerative Hierarchical Clustering (AHC)**, and **DBSCAN**—to group secondary users by their angles (AoDs) and then schedules those users on beams while respecting interference constraints for both primary and secondary users.
 
 ---
